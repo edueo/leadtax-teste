@@ -27,7 +27,7 @@ class ScraperMercadoLivreProduct implements ShouldQueue
     public function handle(): void
     {
         try {
-            $scraperService = new MercadoLivreScraperService;
+            $scraperService = new MercadoLivreScraperService();
             $productDetails = $scraperService->scrapeProductDetails($this->url);
 
             if ($productDetails) {

@@ -59,4 +59,118 @@ class MercadoLivreScraperService
         }
         return array_unique($urls);
     }
+
+    public function scrapeProductDetails(string $url): ?array
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => $this->getRandomUserAgent(),
+                'Accept-Language' => 'pt-BR,pt;q=0.9',
+            ])->get($url);
+
+            if (!$response->successful()) {
+                Log::warning("Falha ao acessar detalhes do produto: {$url} - Status: " . $response->status());
+                return null;
+            }
+
+            $crawler = new Crawler($response->body());
+
+            // Extraindo ID do Mercado Livre da URL
+            preg_match('/MLB-(\d+)|MLB(\d+)/', $url, $matches);
+            Log::debug($matches);
+            $mercadolivreId = $matches[0] ?? $matches[2] ?? null;
+
+            if (!$mercadolivreId) {
+                throw new \Exception("Não foi possível extrair o ID do produto da URL: {$url}");
+            }
+
+            // Preço atual
+            $price = null;
+            try {
+                $priceText = $crawler->filter('.ui-pdp-price__second-line .andes-money-amount__fraction')->text();
+                $priceText = preg_replace('/[^\d]/', '', $priceText);
+                $price = floatval($priceText);
+            } catch (\Exception $e) {
+                // Tentar método alternativo
+                try {
+                    $priceText = $crawler->filter('.andes-money-amount__fraction')->first()->text();
+                    $priceText = preg_replace('/[^\d]/', '', $priceText);
+                    $price = floatval($priceText);
+                } catch (\Exception $ex) {
+                    Log::warning("Não foi possível extrair o preço para o produto: {$url}");
+                }
+            }
+
+            // Título do produto
+            $title = null;
+            try {
+                $title = $crawler->filter('h1.ui-pdp-title')->text();
+            } catch (\Exception $e) {
+                Log::warning("Não foi possível extrair o título para o produto: {$url}");
+            }
+
+            // Extrair descrição
+            $description = null;
+            try {
+                $description = $crawler->filter('.ui-pdp-description__content')->text();
+            } catch (\Exception $e) {
+                // Descrição opcional
+            }
+
+            // Quantidade disponível
+            $availableQuantity = null;
+            try {
+                $availText = $crawler->filter('.ui-pdp-buybox__quantity__available')->text();
+                preg_match('/(\d+)/', $availText, $matches);
+                $availableQuantity = isset($matches[1]) ? intval($matches[1]) : null;
+            } catch (\Exception $e) {
+                // Quantidade disponível opcional
+            }
+
+            // Condição do produto
+            $condition = null;
+            try {
+                $condition = $crawler->filter('.ui-pdp-subtitle')->text();
+            } catch (\Exception $e) {
+                // Condição opcional
+            }
+
+            // Thumbnail
+            $thumbnail = null;
+            try {
+                $thumbnail = $crawler->filter('.ui-pdp-gallery__figure img')->attr('src');
+            } catch (\Exception $e) {
+                // Thumbnail opcional
+            }
+
+            // Vendedor
+            $sellerName = null;
+            $sellerRating = null;
+            try {
+                $sellerName = $crawler->filter('.ui-pdp-seller__header__title')->text();
+                $ratingText = $crawler->filter('.ui-seller-info__status-info .ui-pdp-seller__status-title')->text();
+                preg_match('/(\d+(?:\.\d+)?)/', $ratingText, $matches);
+                $sellerRating = isset($matches[1]) ? floatval($matches[1]) : null;
+            } catch (\Exception $e) {
+                // Informações do vendedor opcionais
+            }
+
+            return [
+                'mercadolivre_id' => 'MLB' . $mercadolivreId,
+                'title' => $title,
+                'price' => $price,
+                'description' => $description,
+                'available_quantity' => $availableQuantity,
+                'condition' => $condition,
+                'permalink' => $url,
+                'thumbnail' => $thumbnail,
+                'seller_name' => $sellerName,
+                'seller_rating' => $sellerRating,
+                'last_updated' => now(),
+            ];
+        } catch (\Exception $e) {
+            Log::error("Erro ao extrair detalhes do produto {$url}: " . $e->getMessage());
+            return null;
+        }
+    }
 }
