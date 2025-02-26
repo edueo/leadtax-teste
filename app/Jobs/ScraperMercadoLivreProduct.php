@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use App\Services\MercadoLivreScraperService;
+use App\Models\Product;
 
 class ScraperMercadoLivreProduct implements ShouldQueue
 {
@@ -31,7 +32,11 @@ class ScraperMercadoLivreProduct implements ShouldQueue
             $productDetails = $scraperService->scrapeProductDetails($this->url);
 
             if ($productDetails) {
-                // TODO: persistir no banco
+
+                $product = Product::updateOrCreate(
+                    ['mercadolivre_id' => $productDetails['mercadolivre_id']],
+                    $productDetails
+                );
                 Log::info("Produto processado com sucesso: {$productDetails['title']}");
             }
         } catch (\Exception $e) {

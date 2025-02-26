@@ -118,11 +118,11 @@ class MercadoLivreScraperService
             }
 
             // Quantidade disponível
-            $availableQuantity = null;
+            $availableQuantity = 0;
             try {
                 $availText = $crawler->filter('.ui-pdp-buybox__quantity__available')->text();
                 preg_match('/(\d+)/', $availText, $matches);
-                $availableQuantity = isset($matches[1]) ? intval($matches[1]) : null;
+                $availableQuantity = isset($matches[1]) ? intval($matches[1]) : 0;
             } catch (\Exception $e) {
                 // Quantidade disponível opcional
             }

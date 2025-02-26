@@ -46,6 +46,7 @@ Nível Sênior
 ```
 
 **Comando para consumir a fila de urls**
+
 ```bash 
 ./vendor/bin/sail php artisan queue:work --tries=3 --backoff=5
 ```
