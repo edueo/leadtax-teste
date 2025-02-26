@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use App\Services\MercadoLivreScraperService;
 
 class ScraperMercadoLivreProduct implements ShouldQueue
 {
@@ -26,7 +27,13 @@ class ScraperMercadoLivreProduct implements ShouldQueue
     public function handle(): void
     {
         try {
-            Log::info($this->url);
+            $scraperService = new MercadoLivreScraperService;
+            $productDetails = $scraperService->scrapeProductDetails($this->url);
+
+            if ($productDetails) {
+                // TODO: persistir no banco
+                Log::info("Produto processado com sucesso: {$productDetails['title']}");
+            }
         } catch (\Exception $e) {
 
             Log::error("Erro ao processar produto {$this->url}: ". $e->getMessage());
