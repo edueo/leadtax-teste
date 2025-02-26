@@ -34,6 +34,11 @@ Nível Sênior
 
 ## Scrapper Mercado Livre
 
+### Bibliotecas utilizadas
+
+- [DomCrawler](https://symfony.com/doc/current/components/dom_crawler.html)
+- [CssSelector](https://symfony.com/doc/current/components/css_selector.html)
+
 **Comando para iniciar o scrapper**
 
 ```bash
