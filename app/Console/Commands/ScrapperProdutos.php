@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\MercadoLivreScraperService;
 use Illuminate\Console\Command;
+use App\Jobs\ScraperMercadoLivreProduct;
 
 class ScrapperProdutos extends Command
 {
@@ -26,19 +27,17 @@ class ScrapperProdutos extends Command
      */
     public function handle()
     {
-        //
         $keyword = $this->argument('keyword') ?? 'smartphone';
         $pages = $this->option('pages');
 
-        // TODO: criar serviço de scrapper
         $scrapperService = new MercadoLivreScraperService();
         $productUrls = $scrapperService->getProductUrls($keyword, $pages);
 
         $this->info(count($productUrls)." produtos encontrados para a palavra-chave: $keyword");
 
-        /*foreach($productUrls as $url){
-            $this->info($url);
-        }*/
+        foreach($productUrls as $url){
+            ScraperMercadoLivreProduct::dispatch($url);
+        }
 
         $this->info("Produtos enviados para a fila de processamento!");
 
