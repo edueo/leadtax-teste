@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\MercadoLivreScraperService;
 use Illuminate\Console\Command;
 
 class ScrapperProdutos extends Command
@@ -30,11 +31,14 @@ class ScrapperProdutos extends Command
         $pages = $this->option('pages');
 
         // TODO: criar serviço de scrapper
-        // buscar urls por palavra-chave e página
+        $scrapperService = new MercadoLivreScraperService();
+        $productUrls = $scrapperService->getProductUrls($keyword, $pages);
 
-        $this->info("X produtos encontrados para a palavra-chave: $keyword");
+        $this->info(count($productUrls)." produtos encontrados para a palavra-chave: $keyword");
 
-        // TODO: foreach para enfileirar as urls
+        /*foreach($productUrls as $url){
+            $this->info($url);
+        }*/
 
         $this->info("Produtos enviados para a fila de processamento!");
 
