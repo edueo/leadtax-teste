@@ -30,3 +30,12 @@ Nível Sênior
 - [] Código otimizado e escalável, com uso de filas e cache.
 - [] Painel de administração para gerenciamento e monitoramento.
 - [] E completar todo checklist das categorias anteriores (junior, pleno, senior)
+
+
+## Scrapper Mercado Livre
+
+**Comando para iniciar o scrapper**
+
+```bash
+./vendor/bin/sail php artisan app:scrapper-produtos --pages=10
+```
