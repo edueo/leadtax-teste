@@ -3,9 +3,10 @@
 ## Setup ambiente local
 
 1. Clonar esse repositório
-2. Instalar as dependências do projeto: `composer install`
-3. Subir os containers: `./vendor/bin/sail up`
-4. Executar as migrations: `./vendor/bin/sail php artisan migrate`
+2. Criar o .env: `cp .env.example .env`
+3. Instalar as dependências do projeto: `composer install`
+4. Subir os containers: `./vendor/bin/sail up`
+5. Executar as migrations: `./vendor/bin/sail php artisan migrate`
 
 ## Componentes da solução
 
