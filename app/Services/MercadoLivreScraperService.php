@@ -78,7 +78,7 @@ class MercadoLivreScraperService
             // Extraindo ID do Mercado Livre da URL
             preg_match('/MLB-(\d+)|MLB(\d+)/', $url, $matches);
             Log::debug($matches);
-            $mercadolivreId = $matches[0] ?? $matches[2] ?? null;
+            $mercadolivreId = $matches[0] ?? 'MLB'. $matches[2] ?? null;
 
             if (!$mercadolivreId) {
                 throw new \Exception("Não foi possível extrair o ID do produto da URL: {$url}");
@@ -156,7 +156,7 @@ class MercadoLivreScraperService
             }
 
             return [
-                'mercadolivre_id' => 'MLB' . $mercadolivreId,
+                'mercadolivre_id' => $mercadolivreId,
                 'title' => $title,
                 'price' => $price,
                 'description' => $description,
